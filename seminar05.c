@@ -3,287 +3,198 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 struct StructuraMasina {
-    int id;
-    int nrUsi;
-    float pret;
-    char* model;
-    char* numeSofer;
-    unsigned char serie;
+	int id;
+	int nrUsi;
+	float pret;
+	char* model;
+	char* numeSofer;
+	unsigned char serie;
 };
 typedef struct StructuraMasina Masina;
-
+typedef struct Nod Nod;
+typedef struct ListaDubla ListaDubla;
 
 struct Nod {
-
-    Masina info;
-    struct Nod* next;
-    struct Nod* prev;
-
+	Masina info;
+	Nod* next;
+	Nod* prev;
 };
-typedef struct Nod Nod;
 
-
-struct Lista {
-
-    Nod* first;
-    Nod* last;
-
+struct ListaDubla {
+	Nod* head;
+	Nod* tail;
 };
-typedef struct Lista Lista;
 
 
 
 Masina citireMasinaDinFisier(FILE* file) {
+	char buffer[100];
+	char sep[3] = ",\n";
+	fgets(buffer, 100, file);
+	char* aux;
+	Masina m1;
+	aux = strtok(buffer, sep);
+	m1.id = atoi(aux);
+	m1.nrUsi = atoi(strtok(NULL, sep));
+	m1.pret = atof(strtok(NULL, sep));
+	aux = strtok(NULL, sep);
+	m1.model = (char*)malloc(strlen(aux) + 1);
+	strcpy(m1.model, aux);
 
-    char buffer[100];
-    char sep[3] = ",\n";
+	aux = strtok(NULL, sep);
+	m1.numeSofer = (char*)malloc(strlen(aux) + 1);
+	strcpy(m1.numeSofer, aux);
 
-    fgets(buffer, 100, file);
-
-    char* aux;
-
-    Masina m;
-
-    aux = strtok(buffer, sep);
-    m.id = atoi(aux);
-
-    m.nrUsi = atoi(strtok(NULL, sep));
-    m.pret = atof(strtok(NULL, sep));
-
-    aux = strtok(NULL, sep);
-    m.model = malloc(strlen(aux) + 1);
-    strcpy(m.model, aux);
-
-    aux = strtok(NULL, sep);
-    m.numeSofer = malloc(strlen(aux) + 1);
-    strcpy(m.numeSofer, aux);
-
-    m.serie = *strtok(NULL, sep);
-
-    return m;
+	m1.serie = *strtok(NULL, sep);
+	return m1;
 }
 
-
-
-void afisareMasina(Masina m) {
-
-    printf("Id: %d\n", m.id);
-    printf("Nr usi: %d\n", m.nrUsi);
-    printf("Pret: %.2f\n", m.pret);
-    printf("Model: %s\n", m.model);
-    printf("Sofer: %s\n", m.numeSofer);
-    printf("Serie: %c\n\n", m.serie);
-
+void afisareMasina(Masina masina) {
+	printf("Id: %d\n", masina.id);
+	printf("Nr. usi : %d\n", masina.nrUsi);
+	printf("Pret: %.2f\n", masina.pret);
+	printf("Model: %s\n", masina.model);
+	printf("Nume sofer: %s\n", masina.numeSofer);
+	printf("Serie: %c\n\n", masina.serie);
 }
 
-
-
-void afisareListaMasini(Lista lista) {
-
-    Nod* temp = lista.first;
-
-    while (temp) {
-
-        afisareMasina(temp->info);
-        temp = temp->next;
-
-    }
-
+void afisareListaMasini(ListaDubla lista) {
+	Nod* p = lista.head;
+	while (p) {
+		afisareMasina(p->info);
+		p = p->next;
+	}
 }
 
-
-
-void adaugaMasinaLaSfarsit(Lista* lista, Masina m) {
-
-    Nod* nou = (Nod*)malloc(sizeof(Nod));
-
-    nou->info = m;
-    nou->next = NULL;
-    nou->prev = lista->last;
-
-    if (lista->last) {
-
-        lista->last->next = nou;
-
-    }
-    else {
-
-        lista->first = nou;
-
-    }
-
-    lista->last = nou;
+void afisareInversaListaMasini(ListaDubla lista) {
+	Nod* p = lista.tail;
+	while (p) {
+		afisareMasina(p->info);
+		p = p->prev;
+	}
 }
 
-
-
-void adaugaMasinaLaInceput(Lista* lista, Masina m) {
-
-    Nod* nou = (Nod*)malloc(sizeof(Nod));
-
-    nou->info = m;
-    nou->prev = NULL;
-    nou->next = lista->first;
-
-    if (lista->first) {
-
-        lista->first->prev = nou;
-
-    }
-    else {
-
-        lista->last = nou;
-
-    }
-
-    lista->first = nou;
+void adaugaMasinaInLista(ListaDubla* ld, Masina masinaNoua) {
+	Nod* nou = (Nod*)malloc(sizeof(Nod));
+	nou->info = masinaNoua;
+	nou->next = NULL;
+	nou->prev = ld->tail;
+	if (ld->tail){
+		ld->tail->next = nou;
+	}
+	else {
+		ld->head = nou;
+	}
+	ld->tail = nou;
 }
 
-
-
-Lista citireListaDinFisier(const char* numeFisier) {
-
-    FILE* f = fopen(numeFisier, "r");
-
-    Lista lista;
-    lista.first = NULL;
-    lista.last = NULL;
-
-    while (!feof(f)) {
-
-        Masina m = citireMasinaDinFisier(f);
-        adaugaMasinaLaSfarsit(&lista, m);
-
-    }
-
-    fclose(f);
-
-    return lista;
+void adaugaLaInceputInLista(ListaDubla* ld, Masina masinaNoua) {
+	Nod* nou = (Nod*)malloc(sizeof(Nod));
+	nou->info = masinaNoua;
+	nou->next = ld->head;
+	nou->prev = NULL;
+	if (ld->head){
+		ld->head->prev = nou;
+	}
+	else {
+		ld->tail = nou;
+	}
+	ld->head = nou;
 }
 
-
-
-void dezalocareLista(Lista* lista) {
-
-    while (lista->first) {
-
-        Nod* temp = lista->first;
-
-        free(temp->info.model);
-        free(temp->info.numeSofer);
-
-        lista->first = lista->first->next;
-
-        free(temp);
-    }
-
-    lista->last = NULL;
+ListaDubla citireLDMasiniDinFisier(const char* numeFisier) {
+	FILE* f = fopen(numeFisier, "r");
+	ListaDubla ld;
+	if (f) {
+		ld.head = ld.tail = NULL;
+		while (!feof(f)) {
+			adaugaMasinaInLista(&ld, citireMasinaDinFisier(f));
+		}
+	}
+	fclose(f);
+	return ld;
 }
 
-
-
-float calculeazaPretMediu(Lista lista) {
-
-    float suma = 0;
-    int contor = 0;
-
-    Nod* temp = lista.first;
-
-    while (temp) {
-
-        suma += temp->info.pret;
-        contor++;
-
-        temp = temp->next;
-    }
-
-    if (contor == 0)
-        return 0;
-
-    return suma / contor;
+void dezalocareLDMasini(ListaDubla* ld) {
+	while (ld->head && ld->head->next) {
+		free(ld->head->info.numeSofer);
+		free(ld->head->info.model);
+ 		ld->head = ld->head->next;
+		free(ld->head->prev);
+	}
+	if (ld->head) {
+		free(ld->head->info.numeSofer);
+		free(ld->head->info.model);
+		free(ld->head);
+	}
+	ld->head=ld->tail=NULL;
 }
 
-
-
-void stergeMasinaDupaID(Lista* lista, int id) {
-
-    Nod* temp = lista->first;
-
-    while (temp) {
-
-        if (temp->info.id == id) {
-
-            if (temp->prev)
-                temp->prev->next = temp->next;
-            else
-                lista->first = temp->next;
-
-            if (temp->next)
-                temp->next->prev = temp->prev;
-            else
-                lista->last = temp->prev;
-
-            free(temp->info.model);
-            free(temp->info.numeSofer);
-
-            Nod* sters = temp;
-            temp = temp->next;
-
-            free(sters);
-        }
-        else {
-
-            temp = temp->next;
-        }
-    }
+float calculeazaPretMediu(ListaDubla ld) {
+	float pret = 0.0f;
+	int cnt = 0;
+	while (ld.head != NULL) {
+		pret += ld.head->info.pret;
+		cnt++;
+		ld.head = ld.head->next;
+	}
+	return pret/cnt;
 }
 
-
-
-char* getNumeSoferMasinaScumpa(Lista lista) {
-
-    Nod* max = lista.first;
-
-    Nod* temp = lista.first->next;
-
-    while (temp) {
-
-        if (temp->info.pret > max->info.pret)
-            max = temp;
-
-        temp = temp->next;
-    }
-
-    char* nume = malloc(strlen(max->info.numeSofer) + 1);
-
-    strcpy(nume, max->info.numeSofer);
-
-    return nume;
+void stergeMasinaDupaID(ListaDubla* ld, int id) {
+	if (ld->head && ld->head->info.id == id) {
+		free(ld->head->info.numeSofer);
+		free(ld->head->info.model);
+		ld->head = ld->head->next;
+		if (ld->head) {
+			free(ld->head->prev);
+		}
+		else {
+			free(ld->tail);
+			ld->tail = NULL;
+	}
+	}
+	Nod* p = ld->head;
+	while (p && p->info.id!=id) {
+		p = p->next;
+	}
+	if (p) {
+		if (p->prev) {
+			p->prev->next = p->next;
+		}
+		if (p->next) {
+			p->next->prev = p->prev;
+		}
+		else {
+			p->prev->next = NULL;
+			ld->tail = p->prev;
+		}
+		free(p->info.numeSofer);
+		free(p->info.model);
+		free(p);
+	}
 }
 
-
+char* getNumeSoferMasinaScumpa(ListaDubla ld) {
+	Nod* nodMasinaScumpa = NULL;
+	int maxx = -1;
+	while (ld.head != NULL) {
+		if (ld.head->info.pret > maxx) {
+			maxx = ld.head->info.pret;
+			nodMasinaScumpa = ld.head;
+		}
+		ld.head = ld.head->next;
+	}
+	return nodMasinaScumpa->info.numeSofer;
+}
 
 int main() {
-
-    Lista lista = citireListaDinFisier("masini.txt");
-
-    afisareListaMasini(lista);
-
-    printf("Pret mediu = %f\n", calculeazaPretMediu(lista));
-
-    char* nume = getNumeSoferMasinaScumpa(lista);
-    printf("Sofer masina scumpa: %s\n", nume);
-
-    free(nume);
-
-    stergeMasinaDupaID(&lista, 2);
-
-    printf("\nDupa stergere:\n");
-
-    afisareListaMasini(lista);
-
-    dezalocareLista(&lista);
-
-    return 0;
+	ListaDubla lista = citireLDMasiniDinFisier("masini.txt");
+	afisareListaMasini(lista);
+	stergeMasinaDupaID(&lista,10);
+	printf("\n\n");
+	afisareListaMasini(lista);
+	return 0;
 }
