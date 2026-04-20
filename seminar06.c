@@ -77,8 +77,8 @@ Masina popStack(Nod** prim) {
 	}
 }
 
-int emptyStack(/*stiva*/) {
-
+int emptyStack(Nod* prim) {
+	return prim == NULL;
 }
 
 Nod* citireStackMasiniDinFisier(const char* numeFisier) {
@@ -92,13 +92,26 @@ Nod* citireStackMasiniDinFisier(const char* numeFisier) {
 	return stivaMasini;
 }
 
-void dezalocareStivaDeMasini(/*stiva*/) {
-	//sunt dezalocate toate masinile si stiva de elemente
+void dezalocareStivaDeMasini(Nod** prim) {
+	while (*prim) {
+		Nod* aux = *prim;
+		*prim = (*prim)->next;
+		free(aux->info.model);
+		free(aux->info.numeSofer);
+		free(aux);
+	}
 }
 
-int size(/*stiva*/) {
-	//returneaza numarul de elemente din stiva
+
+int size(Nod* prim) {
+	int nr = 0;
+	while (prim) {
+		nr++;
+		prim = prim->next;
+	}
+	return nr;
 }
+
 
 //QUEUE
 //putem reprezenta o coada prin LSI, LDI sau vector
@@ -117,7 +130,6 @@ struct listaD {
 
 
 void enqueue(listaD* lista, Masina masina) {
-	//adauga o masina in coada
 
 	NodD* nodNou = (NodD*)malloc(sizeof(NodD));
 	nodNou->info = masina;
@@ -135,7 +147,6 @@ void enqueue(listaD* lista, Masina masina) {
 }
 
 Masina dequeue(listaD* lista) {
-	//extrage o masina din coada
 	Masina rezultat;
 	if (lista->last) {
 		rezultat = lista->last->info;
@@ -163,7 +174,6 @@ listaD citireCoadaDeMasiniDinFisier(const char* numeFisier) {
 
 	listaD coada;
 	coada.first = coada.last = NULL;
-
 	FILE* f = fopen(numeFisier, "r");
 	if (f) {
 		while (!feof(f)) {
@@ -174,10 +184,16 @@ listaD citireCoadaDeMasiniDinFisier(const char* numeFisier) {
 	return coada;
 }
 
-void dezalocareCoadaDeMasini(/*coada*/) {
-	//sunt dezalocate toate masinile si coada de elemente
+void dezalocareCoadaDeMasini(listaD* lista) {
+	while (lista->first) {
+		NodD* aux = lista->first;
+		lista->first = lista->first->next;
+		free(aux->info.model);
+		free(aux->info.numeSofer);
+		free(aux);
+	}
+	lista->last = NULL;
 }
-
 
 Masina getMasinaByID(Nod** prim, int id) {
 	Masina aux;
