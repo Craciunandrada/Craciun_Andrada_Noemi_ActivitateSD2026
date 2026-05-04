@@ -24,9 +24,6 @@ struct NodArbore {
 };
 
 
-
-
-
 Masina citireMasinaDinFisier(FILE* file) {
 	char buffer[100];
 	char sep[3] = ",\n";
@@ -36,7 +33,7 @@ Masina citireMasinaDinFisier(FILE* file) {
 	aux = strtok(buffer, sep);
 	m1.id = atoi(aux);
 	m1.nrUsi = atoi(strtok(NULL, sep));
-	m1.pret= atof(strtok(NULL, sep));
+	m1.pret = atof(strtok(NULL, sep));
 	aux = strtok(NULL, sep);
 	m1.model = malloc(strlen(aux) + 1);
 	strcpy_s(m1.model, strlen(aux) + 1, aux);
@@ -65,8 +62,8 @@ void adaugaMasinaInArbore(NodArbore** root, Masina masinaNoua) {
 	//dupa o anumita cheie pe care o decideti - poate fi ID
 
 	if (*root) {
-		if ((*root)->info.id>masinaNoua.id) {
-		adaugaMasinaInArbore(&(*root)->left, masinaNoua);
+		if ((*root)->info.id > masinaNoua.id) {
+			adaugaMasinaInArbore(&(*root)->left, masinaNoua);
 		}
 		else {
 			adaugaMasinaInArbore(&(*root)->right, masinaNoua);
@@ -74,11 +71,11 @@ void adaugaMasinaInArbore(NodArbore** root, Masina masinaNoua) {
 	}
 	else
 	{
-		NodArbore* nou=(NodArbore*)malloc(sizeof(NodArbore));
-		nou->info=masinaNoua;
-		nou->left=NULL;
-		nou->right=NULL;
-		*root=nou;
+		NodArbore* nou = (NodArbore*)malloc(sizeof(NodArbore));
+		nou->info = masinaNoua;
+		nou->left = NULL;
+		nou->right = NULL;
+		*root = nou;
 	}
 }
 
@@ -87,11 +84,11 @@ NodArbore* citireArboreDeMasiniDinFisier(const char* numeFisier) {
 	//prin apelul repetat al functiei citireMasinaDinFisier()
 	//ATENTIE - la final inchidem fisierul/stream-ul
 
-	FILE* file=fopen(numeFisier,"r");
-	NodArbore* root=NULL;
+	FILE* file = fopen(numeFisier, "r");
+	NodArbore* root = NULL;
 	if (file) {
 		while (!feof(file)) {
-			Masina m=citireMasinaDinFisier(file);
+			Masina m = citireMasinaDinFisier(file);
 			adaugaMasinaInArbore(&root, m);
 		}
 	}
@@ -106,9 +103,9 @@ void afisareMasiniDinArbore(NodArbore* root) { //preordine
 	//folositi toate cele TREI moduri de parcurgere
 
 	if (root != NULL) {
-	afisareMasina(root->info);
-	afisareMasiniDinArbore(root->left);
-	afisareMasiniDinArbore(root->right);
+		afisareMasina(root->info);
+		afisareMasiniDinArbore(root->left);
+		afisareMasiniDinArbore(root->right);
 	}
 }
 
@@ -124,49 +121,49 @@ void dezalocareArboreDeMasini(NodArbore** radacina) {
 	//sunt dezalocate toate masinile si arborele de elemente
 
 	if (*radacina != NULL) {
-	dezalocareArboreDeMasini((*radacina)->left);
-	dezalocareArboreDeMasini((*radacina)->right);
-	
-	free((*radacina)->info.model);
-	free((*radacina)->info.numeSofer);
-	free(*radacina);
-	*radacina=NULL;
-}
+		dezalocareArboreDeMasini(&(*radacina)->left);
+		dezalocareArboreDeMasini(&(*radacina)->right);
+
+		free((*radacina)->info.model);
+		free((*radacina)->info.numeSofer);
+		free(*radacina);
+		*radacina = NULL;
+	}
 }
 
 Masina getMasinaByID(NodArbore* radacina, int id) {
 	if (radacina == NULL) {
 		Masina m;
-		m.id=-1;
+		m.id = -1;
 		return m;
 	}
 	else if (id < radacina->info.id) {
 		return getMasinaByID(radacina->left, id);
 	}
-	else if (id>radacina->info.id) {
+	else if (id > radacina->info.id) {
 		return getMasinaByID(radacina->right, id);
 	}
 	else {
-		Masina m=radacina->info;
-		m.model=malloc(strlen(radacina->info.model)+1);
+		Masina m = radacina->info;
+		m.model = malloc(strlen(radacina->info.model) + 1);
 		strcpy(m.model, radacina->info.model);
 
-		m.numeSofer=malloc(strlen(radacina->info.numeSofer)+1);
+		m.numeSofer = malloc(strlen(radacina->info.numeSofer) + 1);
 		strcpy(m.numeSofer, radacina->info.numeSofer);
 
 		return m;
 	}
-	}
+}
 
 
 int determinaNumarNoduri(NodArbore* radacina) {
 	//calculeaza numarul total de noduri din arborele binar de cautare
 	if (radacina != NULL) {
-	return 1+determinaNumarNoduri(radacina->left)+determinaNumarNoduri(radacina->right);
-		}
-		else {
+		return 1 + determinaNumarNoduri(radacina->left) + determinaNumarNoduri(radacina->right);
+	}
+	else {
 
-	return 0;
+		return 0;
 	}
 }
 
@@ -181,34 +178,51 @@ int calculeazaInaltimeArbore(NodArbore* radacina) {
 	}
 }
 
-float calculeazaPretTotal(NodArbore* radacina)
-	//calculeaza pretul tuturor masinilor din arbore.
-
-	if (radacina) {
-	return radacina->info.pret+calculeazaPretTotal(radacina->left)+calculeazaPretTotal(radacina->right);
-else {
-return 0;
-
-}
-
-
-float calculeazaPretulMasinilorUnuiSofer(NodArbore radacina, const char* numeSofer) {
-	//calculeaza pretul tuturor masinilor unui sofer.
-	if (radacina) {
-		if (strcmp(radacina->info.numeSofer, numeSofer) == 0) {
-			retrun radacina->info.numeSofer+calculeazaPretulMasinilorUnuiSofer(radacina->left, numeSofer)
-			+ calculeazaPretulMasinilorUnuiSofer(radacina->right, numeSofer);
+float calculeazaPretTotal(NodArbore* radacina) {
+	if (radacina != NULL) {
+		return radacina->info.pret
+			+ calculeazaPretTotal(radacina->left)
+			+ calculeazaPretTotal(radacina->right);
 	}
 	return 0;
 }
 
-int main() {
-NodArbore* radacina=citireArboreDeMasiniDinFisier("masini.txt");
-afisareInordine(radacina);
-afisareMasina(getMasinaByID(radacina, 3));
-int numar = determinaNumarNoduri(radacina);
-printf("Numar de noduri: %d\n", numar);
 
+float calculeazaPretulMasinilorUnuiSofer(NodArbore* radacina, const char* numeSofer) {
+	float suma = 0;
+
+	if (radacina != NULL) {
+		if (strcmp(radacina->info.numeSofer, numeSofer) == 0) {
+			suma += radacina->info.pret;
+		}
+
+		suma += calculeazaPretulMasinilorUnuiSofer(radacina->left, numeSofer);
+		suma += calculeazaPretulMasinilorUnuiSofer(radacina->right, numeSofer);
+	}
+
+	return suma;
+}
+
+int main() {
+	NodArbore* radacina = citireArboreDeMasiniDinFisier("masini.txt");
+
+	afisareInordine(radacina);
+
+	puts("Masina cu id 3 este:");
+	Masina m = getMasinaByID(radacina, 3);
+	afisareMasina(m);
+
+	if (m.id != -1) {
+		free(m.model);
+		free(m.numeSofer);
+	}
+
+	printf("Numar de noduri: %d\n", determinaNumarNoduri(radacina));
+	printf("Inaltime arbore: %d\n", calculeazaInaltimeArbore(radacina));
+	printf("Pret total: %.2f\n", calculeazaPretTotal(radacina));
+	printf("Pret masini Ionescu: %.2f\n", calculeazaPretulMasinilorUnuiSofer(radacina, "Ionescu"));
+
+	dezalocareArboreDeMasini(&radacina);
 
 	return 0;
 }
