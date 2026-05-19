@@ -150,11 +150,47 @@ void dezalocareArboreDeMasini(NodArbore** root) { //postordine
 //Preluati urmatoarele functii din laboratorul precedent.
 //Acestea ar trebuie sa functioneze pe noul arbore echilibrat.
 
-Masina getMasinaByID(/*arborele de masini*/int id);
+Masina getMasinaByID(NodArbore* root, int id) {
+if (root == NULL) {
+		Masina m;
+		m.id = -1;
+		return m;
+	}
+	else if (id < root->info.id) {
+		return getMasinaByID(root->left, id);
+	}
+	else if (id > root->info.id) {
+		return getMasinaByID(root->right, id);
+	}
+	else {
+		Masina m = root->info;
+		m.model = malloc(strlen(root->info.model) + 1);
+		strcpy(m.model, root->info.model);
 
-int determinaNumarNoduri(/*arborele de masini*/);
+		m.numeSofer = malloc(strlen(root->info.numeSofer) + 1);
+		strcpy(m.numeSofer, root->info.numeSofer);
 
-float calculeazaPretTotal(/*arbore de masini*/);
+		return m;
+	}
+}
+
+int determinaNumarNoduri(NodArbore* root) {
+	if (root) {
+			return 1 + determinaNumarNoduri(root->left) + determinaNumarNoduri(root->right);
+}
+else {
+	return 0;
+}
+}
+
+float calculeazaPretTotal(NodArbore* root) {
+	if (root) {
+	return root->info.pret + calculeazaPretTotal(root->left) + calculeazaPretTotal(root->right);
+}
+else {
+	return 0;
+}
+}
 
 float calculeazaPretulMasinilorUnuiSofer(NodArbore* root, const char* numeSofer) {
 float sum=0;
